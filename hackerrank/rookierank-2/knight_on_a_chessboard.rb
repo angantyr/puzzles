@@ -1,36 +1,30 @@
 #!/usr/bin/env ruby
 
+# TODO: replace current path tracking, using a hash table, with a queue system
+# based on Dijkstra's algorithm: Invented to find the shortest paths between
+# nodes in a graph, which sounds just like what we're looking for.
+# https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Pseudocode
+
 # n = gets.strip.to_i
 n = 5
 
 class Board
+  attr_accessor :target, :size
+
   def initialize(size)
     @size = size
     @target = [size-1,size-1]
     reset_board
   end
 
-  def target
-    @target
-  end
-
   def reset_board
     @grid = Array.new(size) { Array.new(size, 'O') }
-  end
-
-  def size
-    @size
-  end
-
-  def step(coords)
-    # x,y = coords
-    # @grid[x][y] = 'X'
   end
 
   def show
     puts ''
     @grid.each do |row|
-      puts row.join
+      puts row.join(' ')
     end
     puts ''
   end
@@ -44,28 +38,15 @@ class Board
 end
 
 class Knight
+
+  attr_accessor :path, :position, :path, :board, :step_combo
+
   def initialize(step_combo,board)
     @step_combo = step_combo
     @board = board
     @position = []
     @path = {}
     jump_to([0,0])
-  end
-
-  def path
-    @path
-  end
-
-  def position
-    @position
-  end
-
-  def board
-    @board
-  end
-
-  def step_combo
-    @step_combo
   end
 
   def jump_to(square)
@@ -112,12 +93,12 @@ class Knight
   end
 
 
-  def start
+  def go
     candidate_moves = possible_moves_from(@position)
     candidate_moves.each_with_index do |move|
       jump_to(move)
       return true if arrived?
-      start
+      go
     end
   end
 
@@ -166,7 +147,7 @@ step_combinations.each do |combinations|
     b.reset_board
     k = Knight.new(combination,b)
     # puts k.inspect
-    k.start
+    k.go
     puts "k.path.values.size => #{k.path.values.size}"
     attempts[combination[0]][combination] = k.result
     # puts k.path.inspect
