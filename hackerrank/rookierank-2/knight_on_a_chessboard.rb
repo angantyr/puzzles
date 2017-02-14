@@ -49,6 +49,17 @@ class Knight
     jump_to([0,0])
   end
 
+  def start
+    candidate_moves = possible_moves_from(@position)
+    candidate_moves.each_with_index do |move|
+      jump_to(move)
+      return true if arrived?
+      continue
+    end
+  end
+
+  alias_method :continue, :start
+
   def jump_to(square)
     @path[@position] = square
     @position = square
@@ -92,15 +103,6 @@ class Knight
     c
   end
 
-
-  def go
-    candidate_moves = possible_moves_from(@position)
-    candidate_moves.each_with_index do |move|
-      jump_to(move)
-      return true if arrived?
-      go
-    end
-  end
 
   def result
     puts "path:\n#{path.inspect}"
@@ -147,7 +149,7 @@ step_combinations.each do |combinations|
     b.reset_board
     k = Knight.new(combination,b)
     # puts k.inspect
-    k.go
+    k.start
     puts "k.path.values.size => #{k.path.values.size}"
     attempts[combination[0]][combination] = k.result
     # puts k.path.inspect
